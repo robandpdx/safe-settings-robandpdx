@@ -13,8 +13,8 @@ on:
       - .*
 
 permissions:
-  contents: read
-  packages: read
+  contents: write
+  packages: write
 
 jobs:
   tag:
