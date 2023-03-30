@@ -1,4 +1,4 @@
-name: Create tag
+name: Create tag and deploy image to GH Packages
 
 on:
   pull_request:
@@ -21,11 +21,12 @@ jobs:
     name: Tagging
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          persist-credentials: false
 
       - name: Create new tag
         id: version
@@ -34,3 +35,43 @@ jobs:
             NEW_TAG=$(echo "$LAST_TAG" | awk '{split(substr($0, 2), a, "."); printf "v%d.%d.%d", a[1], a[2], a[3]+1}')
             git tag $NEW_TAG
             git push --tags
+            echo "::set-output name=tag::$NEW_TAG"
+  
+  image:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+    needs: tag
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - run: echo ${{ github.actor }}
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ needs.tag.outputs.tag }}
+          labels: ${{ steps.meta.outputs.labels }}
