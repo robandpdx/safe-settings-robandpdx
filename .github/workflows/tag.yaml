@@ -3,7 +3,7 @@ name: Create tag
 on:
   pull_request:
     branches:
-      - master
+      - main-enterprise
     types:
       - closed
     paths-ignore:
