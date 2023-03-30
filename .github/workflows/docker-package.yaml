@@ -40,6 +40,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Tag if needed
+        id: tag
+        run: |
+          if [[ ${{ github.ref_type }} == "tag" ]]; then 
+            VERSION=$(echo ${{ github.ref }} | sed -e 's/refs\/tags\///g')
+          else
+            LAST_TAG=$(git tag --sort=creatordate --sort=v:refname | tail -n1)
+            VERSION=$(echo "$LAST_TAG" | awk '{split(substr($0, 2), a, "."); printf "v%d.%d.%d", a[1], a[2], a[3]+1}')
+            git tag $VERSION
+            git push --tags
+          fi
+          echo "::set-output name=version::$VERSION"
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v3
@@ -51,5 +64,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.tag.outputs.version }}
           labels: ${{ steps.meta.outputs.labels }}
