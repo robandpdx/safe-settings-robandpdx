@@ -48,6 +48,10 @@ jobs:
     permissions:
       contents: read
       packages: write
+    
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
 
     steps:
       - name: Check out the repo
