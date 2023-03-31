@@ -65,8 +65,8 @@ jobs:
 
       - name: What
         run: |
-          echo "${{ steps.meta.outputs.labels }}"
-          echo "${{ steps.meta.outputs.tags }}"
+          echo "LABELS: ${{ steps.meta.outputs.labels }}"
+          echo "VERSION: ${{ steps.tag.outputs.version }}"
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
