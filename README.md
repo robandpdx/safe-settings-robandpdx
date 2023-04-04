@@ -1,4 +1,4 @@
-# GitHub Safe-Settings
+# GitHub Safe-Settings  
 
 [![Create a release](https://github.com/github/safe-settings/actions/workflows/create-release.yml/badge.svg)](https://github.com/github/safe-settings/actions/workflows/create-release.yml)
 
