@@ -41,9 +41,6 @@ jobs:
           load: true
           tags:  |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main-enterprise
-            platforms: linux/amd64,linux/arm64
-            provenance: false
-            sbom: false
       - name: Inspect the Docker Image
         run: |
           docker image inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main-enterprise
@@ -67,7 +64,10 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.prerelease.outputs.release }}
- 
+          platforms: linux/amd64,linux/arm64
+          provenance: false
+          sbom: false
+
   #trigger-deployment:
   #  needs: build
   #  runs-on: ubuntu-latest
